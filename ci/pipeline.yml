@@ -21,7 +21,7 @@ resources:
       private_key:    ((ansible.private_key))
       vault_password: ((ansible.vault_password))
       inventory:
-        hosts:        ((ansible.hosts))
+        file: ../../../ci/hosts
 
   # Services
   - name: traefik-image

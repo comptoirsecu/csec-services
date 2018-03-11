@@ -32,6 +32,7 @@
         group: 'root'
 
     - name: deploy containers
+      become: yes
       docker_service:
         project_src: .
         pull: yes
