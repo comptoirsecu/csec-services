@@ -1,0 +1,37 @@
+---
+# This ansible playbook will deploy any provided service on host
+- name: deploy docker-compose service on host
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: create file structure on destination host
+      become: yes
+      file:
+        state: directory
+        dest:  "/data/traefik"
+        mode:  '0770'
+        owner: 'root'
+        group: 'root'
+
+    - name: deploy traefik configuration
+      become: yes
+      template:
+        src: traefik.toml.j2
+        dest:  "/data/traefik/traefik.toml"
+        mode:  '0640'
+        owner: 'root'
+        group: 'root'
+
+    - name: create acme.json if it doesn't exists
+      become: yes
+      file:
+        state: touch
+        dest: "/data/traefik/acme.json"
+        mode:  '0600'
+        owner: 'root'
+        group: 'root'
+
+    - name: deploy containers
+      docker_service:
+        project_src: .
+        pull: yes

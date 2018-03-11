@@ -1,0 +1,66 @@
+---
+resource_types:
+  - name: ansible
+    type: docker-image
+    source:
+      repository: platformengineering/concourse-ansible-resource
+
+resources:
+  # Git sources
+  - name: csec-services
+    type: git
+    source:
+      uri: git@github.com:comptoirsecu/csec-services.git
+      private_key:    ((github.private_key))
+
+  # Tools
+  - name: production
+    type: ansible
+    source:
+      remote_user:    ((ansible.remote_user))
+      private_key:    ((ansible.private_key))
+      vault_password: ((ansible.vault_password))
+      inventory:
+        hosts:        ((ansible.hosts))
+
+  # Services
+  - name: traefik-image
+    type: docker-image
+    source:
+      repository: library/traefik
+      tag: alpine
+
+  - name: isso-image
+    type: docker-image
+    source:
+      repository: wonderfall/isso
+      tag: latest
+
+jobs:
+  # Isso
+  - name: deploy-isso
+    plan:
+      - aggregate:
+        - get: isso-image
+          trigger: true
+          params: {skip_download: true}
+        - get: csec-services
+          trigger: true
+      - put: production
+        params:
+          src: csec-services/docker-services/csec-comments
+          playbook: deploy.yml
+
+  # Traefik
+  - name: deploy-traefik
+    plan:
+      - aggregate:
+        - get: traefik-image
+          trigger: true
+          params: {skip_download: true}
+        - get: csec-services
+          trigger: true
+      - put: production
+        params:
+          src: csec-services/docker-services/traefik
+          playbook: deploy.yml
