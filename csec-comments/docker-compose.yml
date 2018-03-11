@@ -1,0 +1,23 @@
+---
+version: '3.5'
+services:
+  csec.isso:
+    image: wonderfall/isso:latest
+    volumes:
+      - /data/csec.isso/config:/config:rw
+      - /data/csec.isso/db:/db:rw
+    expose:
+      - "8080"
+    networks:
+      - web
+    labels:
+      - "traefik.backend=csec-isso"
+      - "traefik.docker.network=web"
+      - "traefik.frontend.rule=Host:comments.comptoirsecu.fr"
+      - "traefik.enable=true"
+      - "traefik.port=8080"
+      - "traefik.default.protocol=http"
+
+networks:
+  web:
+    external: true

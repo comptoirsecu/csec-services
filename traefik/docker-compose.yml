@@ -1,0 +1,20 @@
+---
+version: '3.5'
+
+services:
+  traefik:
+    image: traefik:alpine
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /data/traefik/traefik.toml:/traefik.toml:ro
+      - /data/traefik/acme.json:/acme.json:rw
+
+networks:
+  web:
+    external: true
