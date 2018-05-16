@@ -4,6 +4,7 @@
   hosts: all
   gather_facts: no
   tasks:
+    ## SERVICE PREPARATION
     - name: create file structure on destination host
       become: yes
       file:
@@ -31,8 +32,15 @@
         owner: 'root'
         group: 'root'
 
+    ## SERVICE DEPLOYMENT
+    - name: upload docker-compose
+      become: yes
+      copy:
+        src: .
+        dest: /root/ansible_generated_docker-compose/traefik/
+
     - name: deploy containers
       become: yes
       docker_service:
-        project_src: .
+        project_src: /root/ansible_generated_docker-compose/traefik/
         pull: yes
