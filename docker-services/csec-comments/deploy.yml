@@ -1,0 +1,22 @@
+---
+# This ansible playbook will deploy any provided service on host
+- name: deploy docker-compose service on host
+  hosts: all
+  gather_facts: no
+  tasks:
+    ## SERVICE PREPARATION
+    # already deployed
+    # TODO
+
+    ## SERVICE DEPLOYMENT
+    - name: upload docker-compose
+      become: yes
+      copy:
+        src: .
+        dest: /root/ansible_generated_docker-compose/csec-comments/
+
+    - name: deploy containers
+      become: yes
+      docker_service:
+        project_src: /root/ansible_generated_docker-compose/csec-comments/
+        pull: yes
