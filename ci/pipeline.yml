@@ -24,19 +24,19 @@ resources:
         file: ../../../ci/hosts
 
   # Service Images
-  - name: traefik-image
+  - name: traefik
     type: docker-image
     source:
       repository: library/traefik
       tag: alpine
 
-  - name: isso-image
+  - name: isso
     type: docker-image
     source:
       repository: wonderfall/isso
       tag: latest
 
-  - name: nginx-image
+  - name: nginx
     type: docker-image
     source:
       repository: nginx
@@ -47,7 +47,7 @@ jobs:
   - name: deploy-isso
     plan:
       - aggregate:
-        - get: isso-image
+        - get: isso
           trigger: true
           params: {skip_download: true}
         - get: csec-services
@@ -61,7 +61,7 @@ jobs:
   - name: deploy-traefik
     plan:
       - aggregate:
-        - get: traefik-image
+        - get: traefik
           trigger: true
           params: {skip_download: true}
         - get: csec-services
@@ -75,7 +75,7 @@ jobs:
   - name: deploy-podcasts
     plan:
       - aggregate:
-        - get: nginx-image
+        - get: nginx
           trigger: true
           params: {skip_download: true}
         - get: csec-services

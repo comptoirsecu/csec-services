@@ -16,7 +16,6 @@
       with_items:
         - "/data/csec.podcasts"
         - "/data/csec.podcasts/config"
-        - "/data/csec.podcasts/podcasts"
 
     - name: deploy nginx configuration
       become: yes
@@ -34,10 +33,10 @@
       become: yes
       copy:
         src: .
-        dest: /root/ansible_generated_docker-compose/csec.podcasts/
+        dest: /root/ansible_generated_docker-compose/csec-podcasts/
 
     - name: deploy containers
       become: yes
       docker_service:
-        project_src: /root/ansible_generated_docker-compose/csec.podcasts/
+        project_src: /root/ansible_generated_docker-compose/csec-podcasts/
         pull: yes
