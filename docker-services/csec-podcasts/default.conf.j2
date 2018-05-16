@@ -1,0 +1,21 @@
+server {
+    listen 80;
+    server_name podcasts.comptoirsecu.fr;
+    server_tokens off;
+
+    location = /robots.txt {
+      allow all;
+      log_not_found off;
+      access_log off;
+    }
+
+    location = /favicon.ico {
+      log_not_found off;
+      access_log off;
+    }
+
+    location / {
+        root /podcasts;
+        autoindex on;
+    }
+}

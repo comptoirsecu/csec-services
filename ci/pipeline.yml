@@ -23,7 +23,7 @@ resources:
       inventory:
         file: ../../../ci/hosts
 
-  # Services
+  # Service Images
   - name: traefik-image
     type: docker-image
     source:
@@ -35,6 +35,12 @@ resources:
     source:
       repository: wonderfall/isso
       tag: latest
+
+  - name: nginx-image
+    type: docker-image
+    source:
+      repository: nginx
+      tag: alpine
 
 jobs:
   # Isso
@@ -48,8 +54,8 @@ jobs:
           trigger: true
       - put: production
         params:
-          src: csec-services/docker-services/csec-comments
           playbook: deploy.yml
+          src: csec-services/docker-services/csec-comments
 
   # Traefik
   - name: deploy-traefik
@@ -62,5 +68,19 @@ jobs:
           trigger: true
       - put: production
         params:
-          src: csec-services/docker-services/traefik
           playbook: deploy.yml
+          src: csec-services/docker-services/traefik
+
+  # Podcasts
+  - name: deploy-podcasts
+    plan:
+      - aggregate:
+        - get: nginx-image
+          trigger: true
+          params: {skip_download: true}
+        - get: csec-services
+          trigger: true
+      - put: production
+        params:
+          playbook: deploy.yml
+          src: csec-services/docker-services/csec-podcasts

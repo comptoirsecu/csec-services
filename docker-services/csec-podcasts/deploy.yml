@@ -1,0 +1,43 @@
+---
+# This ansible playbook will deploy any provided service on host
+- name: deploy docker-compose service on host
+  hosts: all
+  gather_facts: no
+  tasks:
+    ## SERVICE PREPARATION
+    - name: create file structure on destination host
+      become: yes
+      file:
+        state: directory
+        dest:  "{{ item }}"
+        mode:  '0750'
+        owner: 'root'
+        group: 'root'
+      with_items:
+        - "/data/csec.podcasts"
+        - "/data/csec.podcasts/config"
+        - "/data/csec.podcasts/podcasts"
+
+    - name: deploy nginx configuration
+      become: yes
+      template:
+        src: "{{ item }}.j2"
+        dest:  "/data/csec.podcasts/config/{{ item }}"
+        mode:  '0640'
+        owner: 'root'
+        group: 'root'
+      with_items:
+        - "default.conf"
+
+    ## SERVICE DEPLOYMENT
+    - name: upload docker-compose
+      become: yes
+      copy:
+        src: .
+        dest: /root/ansible_generated_docker-compose/csec.podcasts/
+
+    - name: deploy containers
+      become: yes
+      docker_service:
+        project_src: /root/ansible_generated_docker-compose/csec.podcasts/
+        pull: yes

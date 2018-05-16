@@ -1,0 +1,23 @@
+---
+version: '3.5'
+services:
+  csec.podcasts:
+    image: nginx:alpine
+    volumes:
+      - /data/csec.podcasts/config/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /data/csec.podcasts/data:/podcasts:ro
+    expose:
+      - "80"
+    networks:
+      - web
+    labels:
+      - "traefik.backend=csec-podcasts"
+      - "traefik.docker.network=web"
+      - "traefik.frontend.rule=Host:podcasts.comptoirsecu.fr"
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.default.protocol=http"
+
+networks:
+  web:
+    external: true
