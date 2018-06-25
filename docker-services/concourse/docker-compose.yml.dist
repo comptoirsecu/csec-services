@@ -1,0 +1,69 @@
+---
+version: '3.5'
+services:
+  concourse:
+    image: concourse/concourse:3.14.1
+    hostname: concourse
+    environment:
+      CONCOURSE_BASIC_AUTH_PASSWORD: changemeconcourse
+      CONCOURSE_BASIC_AUTH_USERNAME: admin-local
+      CONCOURSE_EXTERNAL_URL: https://ci.comptoirsecu.fr
+      CONCOURSE_POSTGRES_DATA_SOURCE: postgres://changeme:changeme@concourse-postgres:5432/concourse?sslmode=disable
+      CONCOURSE_POSTGRES_HOST: concourse-postgres
+      CONCOURSE_LOG_LEVEL: error
+      CONCOURSE_TSA_LOG_LEVEL: error
+      VIRTUAL_HOST: ci.comptoirsecu.fr
+    volumes:
+      - /data/concourse-keys/keys/web:/concourse-keys:ro
+    depends_on:
+      - concourse-postgres
+    expose:
+      - "2222"
+      - "8080"
+    command:
+      - web
+    networks:
+      - web
+      - concourse_back
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.frontend.rule=Host:ci.comptoirsecu.fr"
+      - "traefik.backend=concourse"
+      - "traefik.enable=true"
+      - "traefik.port=8080"
+      - "traefik.default.protocol=http"
+
+  concourse-worker:
+    privileged: true
+    image: concourse/concourse:3.14.1
+    environment:
+      CONCOURSE_TSA_HOST: "concourse:2222"
+      CONCOURSE_LOG_LEVEL: error
+      CONCOURSE_GARDEN_LOG_LEVEL: error
+      CONCOURSE_BAGGAGECLAIM_LOG_LEVEL: error
+    depends_on:
+      - concourse
+    volumes:
+      - /data/concourse-keys/keys/worker:/concourse-keys:ro
+    networks:
+      - concourse_back
+    command:
+      - worker
+
+  concourse-postgres:
+    image: postgres:9.5-alpine
+    hostname: concourse-db
+    environment:
+      PGDATA: /database
+      POSTGRES_DB: concourse
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_USER: changeme
+    volumes:
+      - /data/concourse-pg:/database:rw
+    networks:
+      - concourse_back
+
+networks:
+  concourse_back:
+  web:
+    external: true
