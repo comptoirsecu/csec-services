@@ -1,0 +1,29 @@
+---
+version: '3.5'
+services:
+  csec.files:
+    image: minio/minio:latest
+    environment:
+      MINIO_DOMAIN: files.comptoirsecu.fr
+      MINIO_ACCESS_KEY: changeme
+      MINIO_SECRET_KEY: changeme
+    command:
+      - server
+      - '/data'
+    volumes:
+      - /data/csec.files:/data:rw
+    expose:
+      - "9000"
+    networks:
+      - web
+    labels:
+      - "traefik.backend=csec-files"
+      - "traefik.docker.network=web"
+      - "traefik.frontend.rule=Host:files.comptoirsecu.fr"
+      - "traefik.enable=true"
+      - "traefik.port=9000"
+      - "traefik.default.protocol=http"
+
+networks:
+  web:
+    external: true
